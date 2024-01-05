@@ -809,7 +809,7 @@ enum reg_class
   RCLASS_VECR,
   RCLASS_VECM,
   RCLASS_MAX,
-
+  RCLASS_XBGAS,
   RCLASS_CSR
 };
 
@@ -1149,6 +1149,16 @@ validate_riscv_insn (const struct riscv_opcode *opc, int length)
 	      goto unknown_validate_operand;
 	    }
 	  break; /* end RVV */
+  case 'X': /* Zxbgas */
+	  switch (*++oparg)
+	    {
+	    case 'd': USE_BITS (OP_MASK_RD, OP_SH_RD); break;
+      case 's': USE_BITS (OP_MASK_RS1, OP_SH_RS1); break;
+      case 't': USE_BITS (OP_MASK_RS2, OP_SH_RS2); break;
+	    default:
+	      goto unknown_validate_operand;
+	    }
+	  break; /* end Zxbgas */
 	case ',': break;
 	case '(': break;
 	case ')': break;
@@ -1295,6 +1305,7 @@ md_begin (void)
   hash_reg_names (RCLASS_VECM, riscv_vecm_names_numeric, NVECM);
   /* Add "fp" as an alias for "s0".  */
   hash_reg_name (RCLASS_GPR, "fp", 8);
+  hash_reg_names (RCLASS_XBGAS, riscv_xbgas_names_numeric, NGPR);
 
   /* Create and insert CSR hash tables.  */
   csr_extra_hash = str_htab_create ();
@@ -1464,7 +1475,22 @@ macro_build (expressionS *ep, const char *name, const char *fmt, ...)
 	      goto unknown_macro_argument;
 	    }
 	  break;
-
+  case 'X': /* Zxbgas */
+    switch (*++fmt)
+      {
+        case 'd':
+          INSERT_OPERAND (RD, insn, va_arg (args, int));
+          continue;
+        case 's':
+          INSERT_OPERAND (RS1, insn, va_arg (args, int));
+          continue;
+        case 't':
+          INSERT_OPERAND (RS2, insn, va_arg (args, int));
+	        continue;
+        default:
+	        goto unknown_macro_argument;
+      }
+    break;
 	case 'd':
 	  INSERT_OPERAND (RD, insn, va_arg (args, int));
 	  continue;
@@ -2801,7 +2827,39 @@ riscv_ip (char *str, struct riscv_cl_insn *ip, expressionS *imm_expr,
 		  goto unknown_riscv_ip_operand;
 		}
 	      break; /* end RVV */
+    case 'X': /* Zxbgas */
+	    switch (*++oparg)
+		    {
+          case 'd': /* Destination register.  */
+          case 's': /* Source register.  */
+          case 't': /* Target register.  */
+            if (reg_lookup (&asarg, RCLASS_XBGAS, &regno))
+              {
+                char c = *oparg;
+                if (*asarg == ' ')
+                  ++asarg;
 
+                /* Now that we have assembled one operand, we use the args
+                    string to figure out where it goes in the instruction.  */
+                switch (c)
+                  {
+                  case 's':
+                    INSERT_OPERAND (RS1, *ip, regno);
+                    break;
+                  case 'd':
+                    INSERT_OPERAND (RD, *ip, regno);
+                    break;
+                  case 't':
+                    INSERT_OPERAND (RS2, *ip, regno);
+                    break;
+                  }
+                continue;
+              }
+	          break;
+          default:
+            goto unknown_riscv_ip_operand;
+		      }
+	    break; /* end Zxbgas */
 	    case ',':
 	      ++argnum;
 	      if (*asarg++ == *oparg)

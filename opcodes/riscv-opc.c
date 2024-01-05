@@ -97,6 +97,15 @@ const char * const riscv_vma[2] =
   "mu", "ma"
 };
 
+/* Zxbgas registers. */
+const char *const riscv_xbgas_names_numeric[NGPR] =
+{
+  "e0",   "e1",   "e2",   "e3",   "e4",   "e5",   "e6",   "e7",   "e8",
+  "e9",   "e10",  "e11",  "e12",  "e13",  "e14",  "e15",  "e16",  "e17",
+  "e18",  "e19",  "e20",  "e21",  "e22",  "e23",  "e24",  "e25",  "e26",
+  "e27",  "e28",  "e29",  "e30",  "e31"
+};
+
 /* The order of overloaded instructions matters.  Label arguments and
    register arguments look the same. Instructions that can have either
    for arguments must apear in the correct order in this table for the
@@ -1761,6 +1770,38 @@ const struct riscv_opcode riscv_opcodes[] =
 {"hsv.h",       0, INSN_CLASS_I, "t,0(s)", MATCH_HSV_H, MASK_HSV_H, match_opcode, INSN_DREF|INSN_2_BYTE },
 {"hsv.w",       0, INSN_CLASS_I, "t,0(s)", MATCH_HSV_W, MASK_HSV_W, match_opcode, INSN_DREF|INSN_4_BYTE },
 {"hsv.d",      64, INSN_CLASS_I, "t,0(s)", MATCH_HSV_D, MASK_HSV_D, match_opcode, INSN_DREF|INSN_8_BYTE },
+
+/* Zxbgas instructions */
+{"elb",       0, INSN_CLASS_I, "d,o(s)",  MATCH_ELB,  MASK_ELB,  match_opcode, 0 },
+{"elh",       0, INSN_CLASS_I, "d,o(s)",  MATCH_ELH,  MASK_ELH,  match_opcode, 0 },
+{"elw",       0, INSN_CLASS_I, "d,o(s)",  MATCH_ELW,  MASK_ELW,  match_opcode, 0 },
+{"eld",       64, INSN_CLASS_I, "d,o(s)",  MATCH_ELD,  MASK_ELD,  match_opcode, 0 },
+{"elbu",      0, INSN_CLASS_I, "d,o(s)",  MATCH_ELBU, MASK_ELBU, match_opcode, 0 },
+{"elhu",      0, INSN_CLASS_I, "d,o(s)",  MATCH_ELHU, MASK_ELHU, match_opcode, 0 },
+{"ele",       64, INSN_CLASS_I, "Xd,o(s)",  MATCH_ELE,  MASK_ELE,  match_opcode, 0 },
+{"esd",       64, INSN_CLASS_I, "t,q(s)",  MATCH_ESD,  MASK_ESD,  match_opcode, 0 },
+{"esw",       0, INSN_CLASS_I, "t,q(s)",  MATCH_ESW,  MASK_ESW,  match_opcode, 0 },
+{"esh",       0, INSN_CLASS_I, "t,q(s)",  MATCH_ESH,  MASK_ESH,  match_opcode, 0 },
+{"esb",       0, INSN_CLASS_I, "t,q(s)",  MATCH_ESB,  MASK_ESB,  match_opcode, 0 },
+{"ese",       64, INSN_CLASS_I, "Xt,q(s)",  MATCH_ESE,  MASK_ESE,  match_opcode, 0 },
+{"erld",      64, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLD, MASK_ERLD, match_opcode, 0 },
+{"erlw",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLW, MASK_ERLW, match_opcode, 0 },
+{"erlh",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLH, MASK_ERLH, match_opcode, 0 },
+{"erlhu",     0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLHU,MASK_ERLHU,match_opcode, 0 },
+{"erlb",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLB, MASK_ERLB, match_opcode, 0 },
+{"erlbu",     0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERLBU,MASK_ERLBU,match_opcode, 0 },
+{"ersd",      64, INSN_CLASS_I, "d,s,Xt",   MATCH_ERSD, MASK_ERSD, match_opcode, 0 },
+{"ersw",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERSW, MASK_ERSW, match_opcode, 0 },
+{"ersh",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERSH, MASK_ERSH, match_opcode, 0 },
+{"ersb",      0, INSN_CLASS_I, "d,s,Xt",   MATCH_ERSB, MASK_ERSB, match_opcode, 0 },
+{"erle",      64, INSN_CLASS_I, "Xd,s,Xt",   MATCH_ERLE, MASK_ERLE, match_opcode, 0 },
+{"erse",      64, INSN_CLASS_I, "Xd,s,Xt",   MATCH_ERSE, MASK_ERSE, match_opcode, 0 },
+{"eaddi",     0, INSN_CLASS_I, "d,Xs,o",  MATCH_EADDI, MASK_EADDI, match_opcode, 0 },
+{"eaddie",    0, INSN_CLASS_I, "Xd,s,o",  MATCH_EADDIE,MASK_EADDIE,match_opcode, 0 },
+{"eaddix",    0, INSN_CLASS_I, "Xd,Xs,o",  MATCH_EADDIX,MASK_EADDIX,match_opcode, 0 },
+{"movebe",    0, INSN_CLASS_I, "d,Xs",  MATCH_EADDI, MASK_EADDI  | MASK_IMM,match_opcode, INSN_ALIAS },
+{"moveeb",    0, INSN_CLASS_I, "Xd,s",  MATCH_EADDIE,MASK_EADDIE | MASK_IMM,match_opcode, INSN_ALIAS },
+{"moveee",    0, INSN_CLASS_I, "Xd,Xs",  MATCH_EADDIX,MASK_EADDIX | MASK_IMM,match_opcode, INSN_ALIAS },
 
 /* Terminate the list.  */
 {0, 0, INSN_CLASS_NONE, 0, 0, 0, 0, 0}
