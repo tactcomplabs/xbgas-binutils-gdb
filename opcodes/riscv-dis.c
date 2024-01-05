@@ -70,6 +70,7 @@ set_default_riscv_dis_options (void)
 {
   riscv_gpr_names = riscv_gpr_names_abi;
   riscv_fpr_names = riscv_fpr_names_abi;
+  riscv_xbgas_names = riscv_xbgas_names_numeric;
   no_aliases = 0;
 }
 
@@ -82,6 +83,7 @@ parse_riscv_dis_option_without_args (const char *option)
     {
       riscv_gpr_names = riscv_gpr_names_numeric;
       riscv_fpr_names = riscv_fpr_names_numeric;
+	  riscv_xbgas_names = riscv_xbgas_names_numeric;
     }
   else
     return false;
@@ -379,7 +381,20 @@ print_insn_args (const char *oparg, insn_t l, bfd_vma pc, disassemble_info *info
 	      break;
 	    }
 	  break;
-
+	case 'X': /* Zxbgas */
+		switch (*++oparg)
+			{
+				case 'd':
+					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rd]);
+					break;
+				case 's':
+					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rs1]);
+					break;
+				case 't':
+					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rs2]);
+					break;
+			}
+	  	break;
 	case ',':
 	case '(':
 	case ')':
