@@ -820,8 +820,8 @@ enum reg_class
   RCLASS_FPR,
   RCLASS_VECR,
   RCLASS_VECM,
-  RCLASS_MAX,
   RCLASS_XBGAS,
+  RCLASS_MAX,
   RCLASS_CSR
 };
 
@@ -2883,40 +2883,28 @@ riscv_ip (char *str, struct riscv_cl_insn *ip, expressionS *imm_expr,
 		  goto unknown_riscv_ip_operand;
 		}
 	      break; /* end RVV */
-
-    case 'X': /* Zxbgas */
-	    switch (*++oparg)
-		    {
-          case 'd': /* Destination register.  */
-          case 's': /* Source register.  */
-          case 't': /* Target register.  */
-            if (reg_lookup (&asarg, RCLASS_XBGAS, &regno))
-              {
-                char c = *oparg;
-                if (*asarg == ' ')
-                  ++asarg;
-
-                /* Now that we have assembled one operand, we use the args
-                    string to figure out where it goes in the instruction.  */
-                switch (c)
-                  {
-                  case 's':
-                    INSERT_OPERAND (RS1, *ip, regno);
-                    break;
-                  case 'd':
-                    INSERT_OPERAND (RD, *ip, regno);
-                    break;
-                  case 't':
-                    INSERT_OPERAND (RS2, *ip, regno);
-                    break;
-                  }
-                continue;
-              }
-	          break;
-          default:
-            goto unknown_riscv_ip_operand;
-		      }
-	    break; /* end Zxbgas */
+   case 'X':  /* Zxbgas */
+    switch (*++oparg)
+    {
+      case 'd': /* Destination register.  */
+        if (!reg_lookup(&asarg, RCLASS_XBGAS, &regno))
+          break;
+        INSERT_OPERAND(RD, *ip, regno);
+        continue;
+      case 's': /* Source register.  */
+        if (!reg_lookup(&asarg, RCLASS_XBGAS, &regno))
+          break;
+        INSERT_OPERAND(RS1, *ip, regno);
+        continue;
+      case 't': /* Target register.  */
+        if (!reg_lookup(&asarg, RCLASS_XBGAS, &regno))
+          break;
+        INSERT_OPERAND(RS2, *ip, regno);
+        continue;
+      default:
+        goto unknown_riscv_ip_operand;
+	}
+	break; /* end Zxbgas */
 	    case ',':
 	      ++argnum;
 	      if (*asarg++ == *oparg)
