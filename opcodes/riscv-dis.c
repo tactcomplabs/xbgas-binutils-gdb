@@ -61,6 +61,7 @@ enum riscv_seg_mstate last_map_state;
 
 static const char * const *riscv_gpr_names;
 static const char * const *riscv_fpr_names;
+static const char * const *riscv_xbgas_names;
 
 /* If set, disassemble as most general instruction.  */
 static int no_aliases;
@@ -365,13 +366,13 @@ print_insn_args (const char *oparg, insn_t l, bfd_vma pc, disassemble_info *info
 		switch (*++oparg)
 			{
 				case 'd':
-					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rd]);
+					print (info->stream, "%s", riscv_xbgas_names[rd]);
 					break;
 				case 's':
-					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rs1]);
+					print (info->stream, "%s", riscv_xbgas_names[rs1]);
 					break;
 				case 't':
-					print (info->stream, dis_style_register, "%s", riscv_gpr_names[rs2]);
+					print (info->stream, "%s", riscv_xbgas_names[EXTRACT_OPERAND (RS2, l)]);
 					break;
 			}
 	  	break;
